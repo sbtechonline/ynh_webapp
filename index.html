@@ -1,52 +1,30 @@
-from flask import Flask, render_template_string, request
-import pyodbc
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Patient</title>
+</head>
+<body>
+    <div style="text-align: center;">
+        <img src="https://storageynhprojects.blob.core.windows.net/ynh-images/SB_TECH_ONLINE.png"
+             alt="SB TECH ONLINE Logo" style="height: 100px;">
+        <h2>Register Patient</h2>
+    </div>
 
-app = Flask(__name__)  # FIXED: _name_ ➜ __name__
-
-# Connection string (ensure you handle sensitive data securely in production!)
-conn_str = (
-    "Driver={ODBC Driver 17 for SQL Server};"
-    "Server=tcp:db-sbtechonline.database.windows.net,1433;"
-    "Database=db-sbtechonline;"
-    "Uid=dbadmin;"
-    "Pwd=Yanbu@2025;"
-    "Encrypt=yes;"
-    "TrustServerCertificate=no;"
-    "Connection Timeout=30;"
-)
-
-HTML_FORM = '''
-    <h2>Register Patient</h2>
     <form method="POST">
-        Name: <input name="name"><br><br>
-        Age: <input name="age" type="number"><br><br>
-        Address: <input name="address"><br><br>
+        <label>Name:</label>
+        <input name="name" required><br><br>
+
+        <label>Age:</label>
+        <input name="age" type="number" required><br><br>
+
+        <label>Address:</label>
+        <input name="address" required><br><br>
+
         <button type="submit">Submit</button>
     </form>
+
     {% if patient_id %}
-        <p>Patient Registered. ID: {{ patient_id }}</p>
+        <p style="color: green;">Patient Registered. ID: {{ patient_id }}</p>
     {% endif %}
-'''
-
-@app.route('/', methods=['GET', 'POST'])
-def register():
-    patient_id = None
-    if request.method == 'POST':
-        name = request.form['name']
-        age = request.form['age']
-        address = request.form['address']
-
-        conn = pyodbc.connect(conn_str)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO Patients (Name, Age, Address) OUTPUT INSERTED.PatientId VALUES (?, ?, ?)",
-            (name, age, address)
-        )
-        patient_id = cursor.fetchone()[0]
-        conn.commit()
-        conn.close()
-
-    return render_template_string(HTML_FORM, patient_id=patient_id)
-
-if __name__ == '__main__':  # FIXED: _main_ ➜ __main__
-    app.run(debug=True, host='0.0.0.0', port=5000)  # FIXED: removed stray unicode character
+</body>
+</html>
